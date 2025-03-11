@@ -1,4 +1,5 @@
 require_once '../app/models/FAQ.php';
+
 class FAQController {
     public function index() {
         $faqModel = new FAQ();
