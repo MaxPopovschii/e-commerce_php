@@ -1,4 +1,6 @@
 RewriteEngine On
+
+# Riscrive l'URL per FAQ
 RewriteRule ^faq$ index.php?controller=FAQ&action=index [L]
 RewriteRule ^faq/create$ index.php?controller=FAQ&action=create [L]
 RewriteRule ^faq/store$ index.php?controller=FAQ&action=store [L]
