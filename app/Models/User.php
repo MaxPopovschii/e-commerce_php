@@ -1,73 +1,113 @@
 <?php
 namespace App\Models;
 
-use PDO;
-use App\Database; // Supponiamo che tu abbia una classe Database per la connessione
+use Config\Database;
 use Exception;
 
 class User {
-    public $id;
-    public $name;
-    public $email;
-    public $password;
-    public $created_at;
+    public ?int $id = null;
+    public string $name = '';
+    public string $email = '';
+    public string $password = '';
+    public ?string $created_at = null;
 
-    private static $table = 'users';
+    private static string $table = 'users';
 
-    public function __construct($data = []) {
+    public function __construct(array $data = []) {
         foreach ($data as $key => $value) {
-            if (property_exists($this, $key)) {
+            if (property_exists($this, $key) && $value !== null) {
                 $this->$key = $value;
             }
         }
     }
 
-    public static function all() {
+    /**
+     * Restituisce tutti gli utenti
+     * @return User[]
+     */
+    public static function all(): array {
         $db = Database::getConnection();
-        $stmt = $db->query("SELECT * FROM " . self::$table);
-        return $stmt->fetchAll(PDO::FETCH_CLASS, self::class);
+        $query = "SELECT * FROM " . self::$table;
+        $result = $db->query($query);
+
+        $users = [];
+        while ($row = $result->fetch_assoc()) {
+            $users[] = new self($row);
+        }
+        return $users;
     }
 
-    public static function find($id) {
+    /**
+     * Trova un utente per ID
+     */
+    public static function find(int $id): ?User {
         $db = Database::getConnection();
         $stmt = $db->prepare("SELECT * FROM " . self::$table . " WHERE id = ?");
-        $stmt->execute([$id]);
-        return $stmt->fetchObject(self::class);
+        $stmt->bind_param('i', $id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $data = $result->fetch_assoc();
+
+        return $data ? new self($data) : null;
     }
 
-    public function save() {
+    /**
+     * Salva o aggiorna l'utente
+     */
+    public function save(): void {
         $db = Database::getConnection();
+
         if ($this->id) {
             $stmt = $db->prepare("UPDATE " . self::$table . " SET name = ?, email = ?, password = ? WHERE id = ?");
-            $stmt->execute([$this->name, $this->email, $this->password, $this->id]);
+            $stmt->bind_param('sssi', $this->name, $this->email, $this->password, $this->id);
+            $stmt->execute();
         } else {
             $stmt = $db->prepare("INSERT INTO " . self::$table . " (name, email, password) VALUES (?, ?, ?)");
-            $stmt->execute([$this->name, $this->email, $this->password]);
-            $this->id = $db->lastInsertId();
+            $stmt->bind_param('sss', $this->name, $this->email, $this->password);
+            $stmt->execute();
+            $this->id = $db->insert_id;
         }
     }
 
-    public function delete() {
+    /**
+     * Elimina l'utente
+     */
+    public function delete(): void {
         if (!$this->id) {
             throw new Exception("L'utente non esiste.");
         }
+
         $db = Database::getConnection();
         $stmt = $db->prepare("DELETE FROM " . self::$table . " WHERE id = ?");
-        $stmt->execute([$this->id]);
+        $stmt->bind_param('i', $this->id);
+        $stmt->execute();
     }
 
-    public static function findByEmail($email) {
+    /**
+     * Trova un utente per email
+     */
+    public static function findByEmail(string $email): ?User {
         $db = Database::getConnection();
         $stmt = $db->prepare("SELECT * FROM " . self::$table . " WHERE email = ?");
-        $stmt->execute([$email]);
-        return $stmt->fetchObject(self::class);
+        $stmt->bind_param('s', $email);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $data = $result->fetch_assoc();
+
+        return $data ? new self($data) : null;
     }
 
-    public function setPassword($password) {
+    /**
+     * Imposta la password hashata
+     */
+    public function setPassword(string $password): void {
         $this->password = password_hash($password, PASSWORD_DEFAULT);
     }
 
-    public function verifyPassword($password) {
+    /**
+     * Verifica una password in chiaro rispetto all’hash salvato
+     */
+    public function verifyPassword(string $password): bool {
         return password_verify($password, $this->password);
     }
 }
