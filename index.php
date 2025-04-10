@@ -10,7 +10,7 @@ $request = $_GET['route'] ?? '';
 // Routing semplice
 switch ($request) {
     case '':
-        require __DIR__ . '/app/Views/home.html'; 
+        require __DIR__ . '/app/Views/home.html';
         break;
 
     case 'users':
