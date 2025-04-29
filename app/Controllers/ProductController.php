@@ -1,16 +1,24 @@
 <?php
-namespace App\Controllers;
 
-use App\Models\Product;
+
+
 use Exception;
 
 class ProductController {
+    private function respond($success, $message = '', $data = null) {
+        echo json_encode([
+            "success" => $success,
+            "message" => $message,
+            "data" => $data
+        ]);
+    }
+
     public function index() {
         try {
             $products = Product::all();
-            echo json_encode(["success" => true, "data" => $products]);
+            $this->respond(true, "Prodotti recuperati con successo", $products);
         } catch (Exception $e) {
-            echo json_encode(["success" => false, "message" => $e->getMessage()]);
+            $this->respond(false, $e->getMessage());
         }
     }
 
@@ -18,12 +26,12 @@ class ProductController {
         try {
             $product = Product::find($id);
             if ($product) {
-                echo json_encode(["success" => true, "data" => $product]);
+                $this->respond(true, "Prodotto trovato", $product);
             } else {
-                echo json_encode(["success" => false, "message" => "Prodotto non trovato"]);
+                $this->respond(false, "Prodotto non trovato");
             }
         } catch (Exception $e) {
-            echo json_encode(["success" => false, "message" => $e->getMessage()]);
+            $this->respond(false, $e->getMessage());
         }
     }
 
@@ -36,9 +44,9 @@ class ProductController {
             $product = new Product($data);
             $product->save();
             
-            echo json_encode(["success" => true, "message" => "Prodotto creato con successo", "data" => $product]);
+            $this->respond(true, "Prodotto creato con successo", $product);
         } catch (Exception $e) {
-            echo json_encode(["success" => false, "message" => $e->getMessage()]);
+            $this->respond(false, $e->getMessage());
         }
     }
 }
