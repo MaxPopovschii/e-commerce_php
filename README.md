@@ -1,7 +1,6 @@
-
 # E-commerce App
 
-Una semplice applicazione e-commerce basata su PHP che implementa una struttura MVC. L'app permette di visualizzare e gestire gli utenti e i prodotti, ed è dotata di una gestione delle rotte, inclusa una pagina di errore 404 personalizzata.
+Una semplice applicazione e-commerce basata su PHP che implementa una struttura MVC. L'app permette di visualizzare e gestire utenti e prodotti, ed è dotata di una gestione delle rotte, inclusa una pagina di errore 404 personalizzata.
 
 ## Caratteristiche
 
@@ -10,11 +9,13 @@ Una semplice applicazione e-commerce basata su PHP che implementa una struttura 
 - **Gestione dei prodotti**: visualizza la lista dei prodotti e i dettagli di ogni singolo prodotto.
 - **Pagina di errore 404** personalizzata per le rotte sconosciute.
 - **Semplice routing** per gestire le richieste API e visualizzare i dati.
+- **Fallback automatico su file JSON**: se il database non è disponibile, i dati vengono letti e salvati in file locali nella cartella `data/`.
 
 ## Tecnologie
 
 - **PHP** 7.x o superiore
-- **MySQL** per il database (con tabelle per utenti e prodotti)
+- **MySQL** per il database (opzionale, con tabelle per utenti e prodotti)
+- **File JSON** per il salvataggio locale dei dati (fallback)
 - **CSS** per la parte di styling della vista
 
 ## Installazione
@@ -26,7 +27,7 @@ git clone https://github.com/tuo-utente/e-commerce-app.git
 cd e-commerce-app
 ```
 
-### 2. Configura il Database
+### 2. Configura il Database (opzionale)
 
 Crea il database e le tabelle per l'applicazione utilizzando i seguenti comandi MySQL:
 
@@ -53,9 +54,23 @@ CREATE TABLE products (
 
 ### 3. Configura la Connessione al Database
 
-Assicurati di configurare correttamente la connessione al database nel file `app/Database.php` (modificando le credenziali `host`, `dbName`, `username`, e `password`).
+Assicurati di configurare correttamente la connessione al database nel file `config/config.php` (modificando le credenziali `host`, `dbName`, `username`, e `password`).
 
-### 4. Avvia il Server PHP
+### 4. Modalità senza Database (fallback su file)
+
+Se non vuoi usare MySQL, crea la cartella `data/` e i file vuoti per il salvataggio locale:
+
+```bash
+mkdir -p data
+echo "[]" > data/products.json
+echo "[]" > data/users.json
+echo "[]" > data/orders.json
+echo "[]" > data/wishlist.json
+```
+
+L'app funzionerà automaticamente in modalità file locale se il database non è raggiungibile.
+
+### 5. Avvia il Server PHP
 
 Per avviare il server PHP integrato, esegui il seguente comando dalla cartella principale del progetto:
 
@@ -63,7 +78,7 @@ Per avviare il server PHP integrato, esegui il seguente comando dalla cartella p
 php -S localhost:8000 -t public/
 ```
 
-### 5. Accedi all'App
+### 6. Accedi all'App
 
 Puoi ora accedere all'app nel tuo browser all'indirizzo `http://localhost:8000`.
 
@@ -78,21 +93,20 @@ Puoi ora accedere all'app nel tuo browser all'indirizzo `http://localhost:8000`.
 ```
 e-commerce-app/
 │
-├── app/
-│   ├── Controllers/           # Controller MVC (UserController, ProductController)
-│   ├── Models/                # Modelli per interagire con il database (User, Product)
-│   ├── Database.php           # Gestione della connessione al database
-│   └── Views/                 # Views per l'interfaccia utente (HTML)
-│
+├── controllers/               # Controller MVC (UserController, ProductController, ecc.)
+├── models/                    # Modelli per dati (User, Product, ecc.)
+├── views/                     # Views per l'interfaccia utente (HTML)
+├── data/                      # File JSON per dati locali (fallback)
+│   ├── products.json
+│   ├── users.json
+│   ├── orders.json
+│   └── wishlist.json
+├── config/                    # Configurazione database
+│   └── config.php
 ├── public/                    # Cartella pubblica (accessibile via web)
-│   └── index.php              # Punto di ingresso principale
-│
-├── views/
-│   ├── errors/                # Pagina di errore 404
-│   └── product_view.php       # View per la lista dei prodotti
-│
-├── .gitignore                 # File per ignorare file non necessari nel repository
-└── README.md                  # Questo file
+│   └── index.php
+├── .gitignore
+└── README.md
 ```
 
 ## Contribuire
