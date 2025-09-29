@@ -1,13 +1,11 @@
-<?php
-// $products deve essere un array di prodotti passato dal controller
-?>
+
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Negozio Tecnologia</title>
+    <title>Wishlist</title>
 </head>
 <body>
-    <h1>Prodotti tecnologici</h1>
+    <h1>La tua wishlist</h1>
     <ul>
         <?php foreach ($products as $product): ?>
             <li>
@@ -16,9 +14,12 @@
                 </a>
                 - <?php echo htmlspecialchars($product['category']); ?>
                 - €<?php echo number_format($product['price'], 2); ?>
+                <form method="post" action="?page=wishlist&action=remove&id=<?php echo $product['id']; ?>" style="display:inline;">
+                    <button type="submit">Rimuovi</button>
+                </form>
             </li>
         <?php endforeach; ?>
     </ul>
-    <a href="?page=cart">Vai al carrello</a>
+    <a href="?page=products">Torna ai prodotti</a>
 </body>
 </html>

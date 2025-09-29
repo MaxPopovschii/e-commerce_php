@@ -10,5 +10,9 @@
     <h1><?php echo htmlspecialchars($product['name']); ?></h1>
     <p>Categoria: <?php echo htmlspecialchars($product['category']); ?></p>
     <p>Prezzo: €<?php echo number_format($product['price'], 2); ?></p>
+    <form method="post" action="?page=cart&action=add&id=<?php echo $product['id']; ?>">
+        <button type="submit">Aggiungi al carrello</button>
+    </form>
+    <a href="?page=products">Torna ai prodotti</a>
 </body>
 </html>
